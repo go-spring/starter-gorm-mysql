@@ -27,7 +27,7 @@ type Config struct {
 }
 
 func init() {
-	gs.Group("spring.gorm", func(c Config) (*gorm.DB, error) {
+	gs.Group("${spring.gorm}", func(c Config) (*gorm.DB, error) {
 		return gorm.Open(mysql.Open(c.URL))
 	}, nil)
 }
