@@ -30,7 +30,7 @@ import (
 )
 
 type Service struct {
-	DB *gorm.DB `autowire:""`
+	DB *gorm.DB `autowire:"__default__"`
 }
 
 func main() {
@@ -38,7 +38,6 @@ func main() {
 	// Here `s` is not referenced by any other object,
 	// so we need to register it as a root object.
 	s := &Service{}
-	gs.Root(gs.Object(s))
 
 	http.HandleFunc("/mysql_version", func(w http.ResponseWriter, r *http.Request) {
 		var version string
@@ -50,7 +49,16 @@ func main() {
 		_, _ = w.Write([]byte(version))
 	})
 
-	gs.Run()
+	// Configure and run the Go-Spring application.
+	//
+	// Here we register `s` (the Service instance) as a root object.
+	// Root objects are top-level beans that are not dependencies of any other object.
+	// By providing it as a root, Go-Spring will manage its lifecycle and dependency injection.
+	//
+	// gs.Configure sets up the application configuration, and Run starts the application.
+	gs.Configure(func(app gs.App) {
+		app.Root(app.Provide(s))
+	}).Run()
 
 	// Example usage:
 	//
